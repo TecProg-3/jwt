@@ -21,21 +21,6 @@ function verificarToken(token: string): any {
   return Jwt.verify(token, config.jwtSecret);
 }
 
-/*function login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    
-    const usuario = users.find(u => u.email === email);
-    
-    if (!usuario) return res.status(401).json({ mensaje: 'No existe' });
-  
-    const valido = await bcrypt.compare(password, usuario.password);
-    if (!valido) return res.status(403).json({ mensaje: 'Credenciales inválidas' });
-  
-    const token = generarToken({ id: usuario.id, email: usuario.email });
-    res.json({ token });
-  };
-*/
-
 app.post("/login",(req: Request, res: Response) => {
     const { nombre, password } = req.body;
     const usuario = Users.find(u => u.nombre === nombre);
