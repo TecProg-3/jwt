@@ -8,7 +8,7 @@ interface User {
     nombre: string;
     password: string;
   }
-const Users:User[] = [{"id": 1 , "nombre": "juan" , "password":"123456"}];
+const Users:User[] = [{"id": 1 , "nombre": "juan" , "password":"$2b$10$lqJLSfShYkYF8kkNdti5mOkn/t/XEA67uafg3IqWj8Dfqos0xfM66"}];
 
 const app = express();
 app.use(express.json());
@@ -21,7 +21,7 @@ function verificarToken(token: string): any {
   return Jwt.verify(token, config.jwtSecret);
 }
 
-app.post("/login",(req: Request, res: Response) => {
+app.post("/login",async (req: Request, res: Response) => {
     const { nombre, password } = req.body;
     const usuario = Users.find(u => u.nombre === nombre);
     if (!usuario){
@@ -29,7 +29,7 @@ app.post("/login",(req: Request, res: Response) => {
          res.json({mensaje: 'No existe'});
     }
     else{
-        const valido =  bcrypt.compareSync(password, usuario.password);
+        const valido =  await bcrypt.compare(password, usuario.password,);
 
         if(valido){
              res.json(generar_token({id:usuario.id, nombre:usuario.nombre}));
@@ -41,6 +41,32 @@ app.post("/login",(req: Request, res: Response) => {
     }
 })
 
-app.listen(config.port,() =>{
+app.get("/tokenok",async (req: Request, res: Response) => {
+    
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    //console.log(token);
+    if (token){
+        
+        try{
+            
+            const token_data = verificarToken(token);
+            res.json(token_data);
+        }catch(error){
+            res.status(403);
+            res.json({mensaje: 'Token invalido'});
+        }
+        
+        
+    }
+    else{
+
+        res.status(403);
+        res.json({mensaje: 'Falta Token'});
+        }
+});
+
+
+app.listen(config.port,async() =>{
     console.log("Servidor corriendo...")
 });
