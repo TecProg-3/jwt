@@ -26,13 +26,12 @@ app.post("/login",async (req: Request, res: Response) => {
     const usuario = Users.find(u => u.nombre === nombre);
     if (!usuario){
          res.status(401);
-         res.json({mensaje: 'No existe'});
-    }
+         res.json({ mensaje: 'Usuario no encontrado' });    }
     else{
         const valido =  await bcrypt.compare(password, usuario.password,);
 
         if(valido){
-             res.json(generar_token({id:usuario.id, nombre:usuario.nombre}));
+             res.json({ token: generar_token({ id: usuario.id, nombre: usuario.nombre }) });
         }
         else{
             res.status(403);
